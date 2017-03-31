@@ -5,16 +5,21 @@ int valve3Pin = 5;
 int valve4Pin = 6;
 int valve5Pin = 7;
 
-int humidityRawSensor1 = analogRead(A0);
-int humidityRawSensor2 = analogRead(A1);
-int humidityRawSensor3 = analogRead(A2);
-int humidityRawSensor4 = analogRead(A3);
-int humidityRawSensor5 = analogRead(A4);
+int humidityRawSensor1 = A0;
+int humidityRawSensor2 = A1;
+int humidityRawSensor3 = A2;
+int humidityRawSensor4 = A3;
+int humidityRawSensor5 = A4;
+
+pinmode(pumpPin, OUTPUT);
+digitalWrite(pumpPin, LOW);
+
+pinmode(sensorPower, OUTPUT);
+digitalWrite(sensorPower, LOW);
 
 
-
-int myPowerPins[] = {pumpPin, valve1Pin, valve2Pin, valve3Pin, valve4Pin, valve5Pin, sensorPower};
-int pinCount = 7;
+int valvePowerPins[] = {valve1Pin, valve2Pin, valve3Pin, valve4Pin, valve5Pin};
+int pinCount = 5;
 
 int humidityRawData[] = {humidityRawSensor1, humidityRawSensor2, humidityRawSensor3, humidityRawSensor4, humidityRawSensor5};
 int sensorCount = 5;
