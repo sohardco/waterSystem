@@ -1,15 +1,15 @@
-int pumpPin = 2;
-int valve1Pin = 3;
-int valve2Pin = 4;
-int valve3Pin = 5;
-int valve4Pin = 6;
-int valve5Pin = 7;
+#define pumpPin = 2;
+#define valve1Pin = 3;
+#define valve2Pin = 4;
+#define valve3Pin = 5;
+#define valve4Pin = 6;
+#define valve5Pin = 7;
 
-int humidityRawSensor1 = A0;
-int humidityRawSensor2 = A1;
-int humidityRawSensor3 = A2;
-int humidityRawSensor4 = A3;
-int humidityRawSensor5 = A4;
+#define humidityRawSensor1 = A0;
+#define humidityRawSensor2 = A1;
+#define humidityRawSensor3 = A2;
+#define humidityRawSensor4 = A3;
+#define humidityRawSensor5 = A4;
 
 pinmode(pumpPin, OUTPUT);
 digitalWrite(pumpPin, LOW);
@@ -26,18 +26,25 @@ int sensorCount = 5;
 
 void setup() {
   Serial.begin(250000);
-  configurePinMode(humidityRawData);
-  mapSensordataToPercent(humidityRawData);
+  configurePowerPinMode(valvePowerPins);
+  configureSensorPinMode(humidityRawData);
 
 void loop() {
 
 }
 
-void waterThePlant(){
+void waterThePlant(sortedPotsNeedsWatering){
+  i = 0;
+  while(sortedPotsNeedsWatering[i] == true)
+  {
+    digitalWrite(sortedPotsNeedsWatering[i], HIGH);
     digitalWrite(pumpPin, HIGH);
-    delay (5000);
+    delay(5000);
+    digitalWrite(sortedPotsNeedsWatering[i], LOW);
     digitalWrite(pumpPin, LOW);
-    delay (35000);
+  }
+  i++;
+
 }
 
 void configurePowerPinMode(arrayName){
@@ -54,17 +61,22 @@ void configureSensorPinMode(sensorArray){
 }
 
 int mapSensordataToPercent(sensorArray){
-    int sensorValuesinPercent[5] = for(int i=0; i < sensorCount; i++){
+    int sensorValuesInPercent[5] = for(int i=0; i < sensorCount; i++){
       map(sensorArray[i], 1020, 0, 0, 100);
     }
-    return sensorValuesinPercent;
+    return sensorValuesInPercent;
 }
 
 int moistureLevelChecker(sensorArray);
-int potsNeedWatering
-for(int i=0; i < sensorCount; i++){
-    if (sensorArray[i] < 60){
-      int
+    boolean potsNeedWatering[5];
+    int checkHumidity = for(int i=0; i < sensorCount; i++){
+        analogRead(sensorArray[i]);
+        map(sensorArray[i], 1020, 0, 0, 100);
+        if(sensorArray[i] <= 60){
+          return potsNeedWatering[i] = true;
+        }
+        else{
+          return potsNeedWatering[i] = false;
+        }
     }
-    else
 }
