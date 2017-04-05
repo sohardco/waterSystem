@@ -35,7 +35,7 @@ void setup() {
 }
 
 void loop() {
-
+  
   moistureLevelChecker();
   potWatering();
   delay(1000 * 60 * 60);
@@ -45,7 +45,6 @@ void loop() {
 // Transistor pins status and type declaration
 
 void configurePowerPinMode() {
-
   for(int i = 0; i < pinCount; i++) {
     pinMode(valvePowerPins[i], OUTPUT);
     digitalWrite(valvePowerPins[i], LOW);
@@ -56,11 +55,10 @@ void configurePowerPinMode() {
 // Sensor pins status and type declaration
 
 void configureSensorPinMode(){
-
-    for(int i=0; i < sensorCount; i++) {
+  for(int i=0; i < sensorCount; i++) {
       pinMode(humidityData[i],INPUT);
 
-   }
+  }
 }
 
 // Checks soil moisture level from sensors, maps values to percents and records data to new array in boolean
@@ -69,36 +67,35 @@ void moistureLevelChecker() {
 
   digitalWrite(sensorPower, HIGH);
 
-    for(int i = 0; i < sensorCount; i++) {
-        int rawSensorData = analogRead(humidityData[i]);
-        int sensorDataInPercent = map(rawSensorData, 1020, 0, 0, 100);
+  for(int i = 0; i < sensorCount; i++) {
+    int rawSensorData = analogRead(humidityData[i]);
+    int sensorDataInPercent = map(rawSensorData, 1020, 0, 0, 100);
 
-          if(sensorDataInPercent <= 60) {
+    if(sensorDataInPercent <= 60) {
             potsNeedWatering[i] = true;
-          }
-          else {
-            potsNeedWatering[i] = false;
-          }
     }
+    else {
+            potsNeedWatering[i] = false;
+    }
+  }
 }
 
 void potWatering() {
 
   digitalWrite(pumpPin, HIGH);
 
-    for(int i = 0; i < potsCount; i++){
-      if(potsNeedWatering[i] == true) {
+  for(int i = 0; i < potsCount; i++){
+    if(potsNeedWatering[i] == true) {
         digitalWrite(valvePowerPins[i], HIGH);
-      }
+    }
 
     delay(5000);
     digitalWrite(pumpPin, LOW);
-    
+
     for(int i = 0; i < potsCount; i++){
       if(potsNeedWatering[i] == true) {
         digitalWrite(valvePowerPins[i], HIGH);
       }
-
-
     }
+  }
 }
