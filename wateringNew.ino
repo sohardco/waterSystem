@@ -12,6 +12,8 @@
 #define humiditySensor4 A3
 #define humiditySensor5 A4
 
+#define hour 1000L * 60 * 60  //Watering cycle shutdown delay
+
 int valvePowerPins[] = {valve1Pin, valve2Pin, valve3Pin, valve4Pin, valve5Pin};
 int pinCount = 5;
 
@@ -35,10 +37,10 @@ void setup() {
 }
 
 void loop() {
-  
+
   moistureLevelChecker();
   potWatering();
-  delay(1000 * 60 * 60);
+  delay(hour);
 
 }
 
