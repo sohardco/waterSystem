@@ -56,7 +56,7 @@ void configurePowerPinMode() {
 
 // Sensor pins status and type declaration
 
-void configureSensorPinMode(){
+void configureSensorPinMode() {
   for(int i=0; i < sensorCount; i++) {
       pinMode(humidityData[i],INPUT);
 
@@ -86,18 +86,15 @@ void potWatering() {
 
   digitalWrite(pumpPin, HIGH);
 
-  for(int i = 0; i < potsCount; i++){
+  for(int i = 0; i < potsCount; i++) {
     if(potsNeedWatering[i] == true) {
-        digitalWrite(valvePowerPins[i], HIGH);
+      digitalWrite(valvePowerPins[i], HIGH);
     }
+  }
+  delay(5000);
+  digitalWrite(pumpPin, LOW);
 
-    delay(5000);
-    digitalWrite(pumpPin, LOW);
-
-    for(int i = 0; i < potsCount; i++){
-      if(potsNeedWatering[i] == true) {
-        digitalWrite(valvePowerPins[i], HIGH);
-      }
-    }
+  for(int i = 0; i < potsCount; i++) {
+    digitalWrite(valvePowerPins[i], LOW);
   }
 }
