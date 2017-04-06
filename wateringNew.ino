@@ -50,7 +50,6 @@ void configurePowerPinMode() {
   for(int i = 0; i < pinCount; i++) {
     pinMode(valvePowerPins[i], OUTPUT);
     digitalWrite(valvePowerPins[i], LOW);
-
    }
 }
 
@@ -58,8 +57,7 @@ void configurePowerPinMode() {
 
 void configureSensorPinMode() {
   for(int i=0; i < sensorCount; i++) {
-      pinMode(humidityData[i],INPUT);
-
+    pinMode(humidityData[i],INPUT);
   }
 }
 
@@ -74,10 +72,10 @@ void moistureLevelChecker() {
     int sensorDataInPercent = map(rawSensorData, 1020, 0, 0, 100);
 
     if(sensorDataInPercent <= 60) {
-            potsNeedWatering[i] = true;
+      potsNeedWatering[i] = true;
     }
     else {
-            potsNeedWatering[i] = false;
+      potsNeedWatering[i] = false;
     }
   }
 }
@@ -91,6 +89,7 @@ void potWatering() {
       digitalWrite(valvePowerPins[i], HIGH);
     }
   }
+
   delay(5000);
   digitalWrite(pumpPin, LOW);
 
