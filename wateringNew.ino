@@ -10,9 +10,25 @@
 #define humiditySensor2 A1
 #define humiditySensor3 A2
 #define humiditySensor4 A3
-#define humiditySensor5 A4
+#define humiditySensor5 A6
 
-#define hour 1000L * 60 * 60  //Watering cycle shutdown delay
+// Timing control section
+#define delayHour 1000L * 60 * 60  // Watering cycle shutdown delay
+
+int middleOfDayStart = 12; // Used to define sleep time diapason
+int middleOfDayStop = 15;
+int dusk = 0;
+int dawn = 6;
+
+#include <DS3231.h>
+DS3231  rtc(A4, A5); // Init the DS3231 using the hardware interface
+
+Time rtcTime = rtc.getTime();  // get RTC compund data (object)
+// int MySec = MyTime.sec;  // extract seconds - not used in condition further below
+// int MyMin = MyTime.min;  //extract minutes
+int rtcHour = rtcTime.hour;  // extrac hour
+
+// boolean startCheckCycle = false;
 
 int valvePowerPins[] = {valve1Pin, valve2Pin, valve3Pin, valve4Pin, valve5Pin};
 int pinCount = 5;
@@ -24,6 +40,8 @@ boolean potsNeedWatering[5];
 int potsCount = 5;
 
 void setup() {
+
+  rtc.begin();
 
   pinMode(pumpPin, OUTPUT);
   digitalWrite(pumpPin, LOW);
@@ -38,9 +56,11 @@ void setup() {
 
 void loop() {
 
-  moistureLevelChecker();
-  potWatering();
-  delay(hour);
+  if(isTimeToWater()){
+    moistureLevelChecker();
+    potWatering();
+  }
+  delay(delayHour);
 
 }
 
@@ -59,6 +79,13 @@ void configureSensorPinMode() {
   for(int i=0; i < sensorCount; i++) {
     pinMode(humidityData[i],INPUT);
   }
+}
+
+boolean isTimeToWater() {
+  if(middleOfDayStart <= rtcHour >= middleOfDayStop || dusk <= rtcHour >= dawn) {
+    return false;
+  }
+  return true;
 }
 
 // Checks soil moisture level from sensors, maps values to percents and records data to new array in boolean
