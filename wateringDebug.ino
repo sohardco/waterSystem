@@ -13,7 +13,7 @@
 #define humiditySensor5 A6
 
 // Timing control section
-#define delayHour 1000L * 60 * 60  // Watering cycle shutdown delay
+#define delayHour 3000//1000L * 60 * 60  // Watering cycle shutdown delay
 
 int middleOfDayStart = 12; // Used to define sleep time diapason
 int middleOfDayStop = 15;
@@ -23,17 +23,17 @@ int dawn = 6;
 #include <DS3231.h>
 DS3231  rtc(A4, A5); // Init the DS3231 using the hardware interface
 
-Time rtcTime = rtc.getTime();  // get RTC compund data (object)
+//Time rtcTime = rtc.getTime();  // get RTC compund data (object)
 // int MySec = MyTime.sec;  // extract seconds - not used in condition further below
 // int MyMin = MyTime.min;  //extract minutes
-int rtcHour = rtcTime.hour;  // extrac hour
+int rtcHour = 7;//rtcTime.hour;  // extrac hour
 
 // boolean startCheckCycle = false;
 
 int valvePowerPins[] = {valve1Pin, valve2Pin, valve3Pin, valve4Pin, valve5Pin};
 int pinCount = 5;
 
-int humidityData[] = {humiditySensor1, humiditySensor2, humiditySensor3, humiditySensor4, humiditySensor5};
+int humidityData[] = {1000, 0, 0, 0, 1000};
 int sensorCount = 5;
 
 boolean potsNeedWatering[5];
@@ -41,7 +41,7 @@ int potsCount = 5;
 
 void setup() {
 
-  // Serial.begin(9600);
+   Serial.begin(9600);
 
   rtc.begin();
 
@@ -59,11 +59,13 @@ void setup() {
 void loop() {
 
   if(isTimeToWater() == true){
+    Serial.println("Start Check/Watering");
     moistureLevelChecker();
     potWatering();
   }
   else{
-    delay(delayHour);
+  Serial.println("No need to water");
+  delay(delayHour);
   }
 }
 
@@ -98,8 +100,14 @@ void moistureLevelChecker() {
   digitalWrite(sensorPower, HIGH);
 
   for(int i = 0; i < sensorCount; i++) {
-    int rawSensorData = analogRead(humidityData[i]);
+    int rawSensorData = humidityData[i];
+    Serial.print("Rawdata: ");
+    Serial.println(rawSensorData);
+    delay(1000);
     int sensorDataInPercent = map(rawSensorData, 1020, 0, 0, 100);
+    Serial.print("Mapdata: ");
+    Serial.println(sensorDataInPercent);
+    delay(1000);
 
     if(sensorDataInPercent <= 60) {
       potsNeedWatering[i] = true;
@@ -108,19 +116,32 @@ void moistureLevelChecker() {
       potsNeedWatering[i] = false;
     }
   }
+  for (int i = 0; i < potsCount; i++) {
+    Serial.print("Pots needs watering: ");
+    Serial.println(potsNeedWatering[i]);
+  }
 }
 
 void potWatering() {
   for(int i = 0; i < potsCount; i++) {
     if(potsNeedWatering[i] == true) {
+      digitalWrite(pumpPin, HIGH);
+      Serial.print("pumpPin: ");
+      Serial.println(pumpPin);
       digitalWrite(valvePowerPins[i], HIGH);
     }
   }
-  digitalWrite(pumpPin, HIGH);
+  for (int i = 0; i < potsCount; i++) {
+    if(potsNeedWatering[i] == true) {
+      Serial.print("Engaged valves ");
+      Serial.println(valvePowerPins[i]);
+    }
+  }
   delay(5000);
   digitalWrite(pumpPin, LOW);
 
   for(int i = 0; i < potsCount; i++) {
     digitalWrite(valvePowerPins[i], LOW);
   }
+
 }
