@@ -1,3 +1,4 @@
+#include <DS3231.h>
 #define pumpPin 2
 #define valve1Pin 3
 #define valve2Pin 4
@@ -13,27 +14,18 @@
 #define humiditySensor5 A6
 
 // Timing control section
-#define delayHour 3000//1000L * 60 * 60  // Watering cycle shutdown delay
-
-int middleOfDayStart = 12; // Used to define sleep time diapason
+#define delayHour 1000L * 60 * 60  // Watering cycle shutdown delay
+int middleOfDayStart = 12; // Define mid -day sleep time diapason
 int middleOfDayStop = 15;
-int dusk = 0;
+int dusk = 0; // Define nightly sleep time diapason
 int dawn = 6;
-
-#include <DS3231.h>
 DS3231  rtc(A4, A5); // Init the DS3231 using the hardware interface
-
-//Time rtcTime = rtc.getTime();  // get RTC compund data (object)
-// int MySec = MyTime.sec;  // extract seconds - not used in condition further below
-// int MyMin = MyTime.min;  //extract minutes
-int rtcHour = 7;//rtcTime.hour;  // extrac hour
-
-// boolean startCheckCycle = false;
+Time rtcTime;  //Define structure named rtcTime of the Time-class
 
 int valvePowerPins[] = {valve1Pin, valve2Pin, valve3Pin, valve4Pin, valve5Pin};
 int pinCount = 5;
 
-int humidityData[] = {1000, 0, 0, 0, 1000};
+int humidityData[] = {humiditySensor1, humiditySensor2, humiditySensor3, humiditySensor4, humiditySensor5};
 int sensorCount = 5;
 
 boolean potsNeedWatering[5];
@@ -41,7 +33,7 @@ int potsCount = 5;
 
 void setup() {
 
-   Serial.begin(9600);
+  // Serial.begin(9600);
 
   rtc.begin();
 
@@ -59,13 +51,13 @@ void setup() {
 void loop() {
 
   if(isTimeToWater() == true){
-    Serial.println("Start Check/Watering");
+  Serial.println("Start Check/Watering");
     moistureLevelChecker();
     potWatering();
   }
   else{
   Serial.println("No need to water");
-  delay(delayHour);
+    delay(delayHour);
   }
 }
 
@@ -87,6 +79,12 @@ void configureSensorPinMode() {
 }
 
 boolean isTimeToWater() {
+
+  rtcTime = rtc.getTime(); // get RTC compund data (object)
+  int rtcHour = rtcTime.hour;  // extract hour
+  // int MySec = MyTime.sec;  // extract seconds
+  // int MyMin = MyTime.min;  //extract minutes
+
   if((rtcHour >= middleOfDayStart) && (rtcHour <= middleOfDayStop) || (rtcHour >= dusk) && (rtcHour <= dawn)) {
     return false;
   }
@@ -100,7 +98,7 @@ void moistureLevelChecker() {
   digitalWrite(sensorPower, HIGH);
 
   for(int i = 0; i < sensorCount; i++) {
-    int rawSensorData = humidityData[i];
+    int rawSensorData = analogRead(humidityData[i]);
     Serial.print("Rawdata: ");
     Serial.println(rawSensorData);
     delay(1000);
@@ -116,32 +114,21 @@ void moistureLevelChecker() {
       potsNeedWatering[i] = false;
     }
   }
-  for (int i = 0; i < potsCount; i++) {
-    Serial.print("Pots needs watering: ");
-    Serial.println(potsNeedWatering[i]);
-  }
 }
 
 void potWatering() {
   for(int i = 0; i < potsCount; i++) {
     if(potsNeedWatering[i] == true) {
-      digitalWrite(pumpPin, HIGH);
-      Serial.print("pumpPin: ");
-      Serial.println(pumpPin);
+      Serial.print("Engaged valves ");
+      Serial.println(valvePowerPins[i]);
       digitalWrite(valvePowerPins[i], HIGH);
     }
   }
-  for (int i = 0; i < potsCount; i++) {
-    if(potsNeedWatering[i] == true) {
-      Serial.print("Engaged valves ");
-      Serial.println(valvePowerPins[i]);
-    }
-  }
+  digitalWrite(pumpPin, HIGH);
   delay(5000);
   digitalWrite(pumpPin, LOW);
 
   for(int i = 0; i < potsCount; i++) {
     digitalWrite(valvePowerPins[i], LOW);
   }
-
 }
