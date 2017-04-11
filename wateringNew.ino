@@ -1,3 +1,4 @@
+#include <DS3231.h>
 #define pumpPin 2
 #define valve1Pin 3
 #define valve2Pin 4
@@ -14,21 +15,12 @@
 
 // Timing control section
 #define delayHour 1000L * 60 * 60  // Watering cycle shutdown delay
-
 int middleOfDayStart = 12; // Used to define sleep time diapason
 int middleOfDayStop = 15;
 int dusk = 0;
 int dawn = 6;
-
-#include <DS3231.h>
 DS3231  rtc(A4, A5); // Init the DS3231 using the hardware interface
-
-Time rtcTime = rtc.getTime();  // get RTC compund data (object)
-// int MySec = MyTime.sec;  // extract seconds - not used in condition further below
-// int MyMin = MyTime.min;  //extract minutes
-int rtcHour = rtcTime.hour;  // extrac hour
-
-// boolean startCheckCycle = false;
+Time rtcTime;  //Define structure named rtcTime of the Time-class
 
 int valvePowerPins[] = {valve1Pin, valve2Pin, valve3Pin, valve4Pin, valve5Pin};
 int pinCount = 5;
@@ -85,6 +77,12 @@ void configureSensorPinMode() {
 }
 
 boolean isTimeToWater() {
+
+  rtcTime = rtc.getTime(); // get RTC compund data (object)
+  int rtcHour = rtcTime.hour;  // extract hour
+  // int MySec = MyTime.sec;  // extract seconds
+  // int MyMin = MyTime.min;  //extract minutes
+
   if((rtcHour >= middleOfDayStart) && (rtcHour <= middleOfDayStop) || (rtcHour >= dusk) && (rtcHour <= dawn)) {
     return false;
   }
